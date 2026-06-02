@@ -67,10 +67,10 @@ google_oauth:
 encryption_key: ${BOW_ENCRYPTION_KEY}
 
 intercom:
-  enabled: true
+  enabled: false
 
 telemetry:
-  enabled: true
+  enabled: false
 
 swagger:
   enabled: false

@@ -1,0 +1,77 @@
+# =============================================================================
+# Bag of Words - Dokploy Deployment (build from source)
+# =============================================================================
+#
+# Dokploy provides Traefik as reverse proxy + SSL, so no Caddy needed.
+# This compose only runs: PostgreSQL + App (built from local Dockerfile).
+#
+# Setup:
+#   1. Set environment variables in Dokploy (or .env file)
+#   2. Point Dokploy to this file as compose path
+#   3. Configure domain in Dokploy → routes to app:3000
+#
+# Required env vars:
+#   POSTGRES_PASSWORD    - strong password for PostgreSQL
+#   BOW_ENCRYPTION_KEY   - persistent Fernet key (generate once)
+#
+# Generate encryption key:
+#   python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+#
+# =============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bowpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-bagofwords}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bow} -d ${POSTGRES_DB:-bagofwords}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - bow-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+      - BOW_DATABASE_URL=postgresql://${POSTGRES_USER:-bow}:${POSTGRES_PASSWORD:-bowpassword}@postgres:5432/${POSTGRES_DB:-bagofwords}
+      - BOW_ENCRYPTION_KEY=${BOW_ENCRYPTION_KEY:-}
+      - BOW_LICENSE_KEY=${BOW_LICENSE_KEY:-}
+      - BOW_CONFIG_PATH=/app/bow-config.yaml
+    volumes:
+      - ./bow-config.yaml:/app/bow-config.yaml:ro
+      - uploads_data:/app/backend/uploads
+      - branding_data:/app/backend/branding_uploads
+      - logs_data:/app/backend/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks:
+      - bow-network
+
+volumes:
+  postgres_data:
+  uploads_data:
+  branding_data:
+  logs_data:
+
+networks:
+  bow-network:
+    driver: bridge
