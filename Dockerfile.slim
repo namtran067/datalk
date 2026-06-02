@@ -103,8 +103,6 @@ COPY --from=frontend-builder --chown=app:app /app/frontend/.output/public /app/f
 COPY --from=frontend-builder --chown=app:app /app/frontend/public/artifact-sandbox.html /app/frontend/public/artifact-sandbox.html
 COPY --from=frontend-builder --chown=app:app /app/frontend/public/libs /app/frontend/public/libs
 
-COPY --chown=app:app ./backend/requirements-slim.txt /app/backend/
-
 RUN mkdir -p /app/backend/uploads/files /app/backend/uploads/branding \
              /app/backend/branding_uploads /app/backend/logs && \
     chown -R app:app /app
