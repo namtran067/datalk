@@ -53,6 +53,8 @@ RUN cargo build --release --locked && \
 FROM ubuntu:24.04 AS frontend-builder
 
 ENV DEBIAN_FRONTEND=noninteractive
+# Increase Node.js heap size to avoid OOM during Vite build (Monaco, ECharts, AG Grid are heavy)
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 # Install Node.js 22 and prepare environment
 RUN apt-get update && \

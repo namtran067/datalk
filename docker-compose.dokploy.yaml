@@ -1,9 +1,11 @@
 # =============================================================================
-# Bag of Words - Dokploy Deployment (build from source)
+# Bag of Words - Dokploy Deployment (build from source, slim image)
 # =============================================================================
 #
+# Uses Dockerfile.slim — ~1.2 GB image (vs ~4.8 GB full image).
+# Removed: Playwright, LibreOffice, ODBC drivers, Rust builder, 130+ packages.
+#
 # Dokploy provides Traefik as reverse proxy + SSL, so no Caddy needed.
-# This compose only runs: PostgreSQL + App (built from local Dockerfile).
 #
 # Setup:
 #   1. Set environment variables in Dokploy (or .env file)
@@ -41,8 +43,10 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.slim
     restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
     environment:
       - ENVIRONMENT=production
       - BOW_DATABASE_URL=postgresql://${POSTGRES_USER:-bow}:${POSTGRES_PASSWORD:-bowpassword}@postgres:5432/${POSTGRES_DB:-bagofwords}
