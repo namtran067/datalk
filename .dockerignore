@@ -3,6 +3,7 @@
 .github
 .gitignore
 .gitattributes
+.kilo
 
 # Documentation
 *.md

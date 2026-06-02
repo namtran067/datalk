@@ -1,5 +1,5 @@
 # Node.js (Frontend)
-
+.kilo
 backend/uploads/
 backend/*.db
 backend/db/
@@ -27,6 +27,7 @@ frontend/tests/config/*.json
 # Logs
 backend/logs
 *.log
+docs/
 
 # Misc
 .DS_Store
