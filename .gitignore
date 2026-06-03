@@ -31,6 +31,7 @@ docs/
 
 # Misc
 .DS_Store
+.kilo.json
 
 # Local env files
 .env

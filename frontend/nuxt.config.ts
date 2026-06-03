@@ -1,7 +1,7 @@
 import { defineNuxtConfig } from "nuxt/config"
 
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
   ssr: false,
 
   modules: [

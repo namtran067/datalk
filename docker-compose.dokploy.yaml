@@ -31,6 +31,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-bagofwords}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bow} -d ${POSTGRES_DB:-bagofwords}"]
       interval: 10s
@@ -53,6 +59,13 @@ services:
       - BOW_ENCRYPTION_KEY=${BOW_ENCRYPTION_KEY:-}
       - BOW_LICENSE_KEY=${BOW_LICENSE_KEY:-}
       - BOW_CONFIG_PATH=/app/bow-config.yaml
+      - UVICORN_WORKERS=1
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
     volumes:
       - ./bow-config.yaml:/app/bow-config.yaml:ro
       - uploads_data:/app/backend/uploads
