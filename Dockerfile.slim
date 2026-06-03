@@ -46,7 +46,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git curl && \
+    apt-get install -y --no-install-recommends git && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -61,9 +61,6 @@ WORKDIR /app/frontend
 RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 
 RUN yarn install --frozen-lockfile
-
-COPY ./scripts/download-vendor-libs.sh /app/scripts/download-vendor-libs.sh
-RUN bash /app/scripts/download-vendor-libs.sh /app/frontend/public/libs
 
 RUN yarn generate
 
